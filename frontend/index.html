@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth API Client</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --success: #22c55e;
+            --error: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #2a2a3a;
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Animated background */
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, var(--accent-glow) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 40px var(--accent-glow);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2 .icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5558dd;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-tertiary);
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        /* Response display */
+        .response-container {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        .response-body {
+            padding: 16px;
+            max-height: 400px;
+            overflow: auto;
+        }
+
+        .response-body pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* Token display */
+        .token-display {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border-left: 3px solid var(--success);
+        }
+
+        .token-display h4 {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .token-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--success);
+            word-break: break-all;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Method selector styling */
+        .method-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        /* Full width card */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    
+    <div class="container">
+        <header>
+            <h1>🔐 Auth API Client</h1>
+            <p>Test your Spring Boot JWT Authentication API</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Authentication Card -->
+            <div class="card">
+                <h2><span class="icon">🔑</span> Authentication</h2>
+                
+                <div class="tabs">
+                    <button class="tab active" data-tab="login">Login</button>
+                    <button class="tab" data-tab="register">Register</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" placeholder="Enter username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Sign In</span>
+                        <div class="spinner hidden"></div>
+                    </button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" class="auth-form hidden">
+                    <div class="form-group">
+                        <label for="regUsername">Username</label>
+                        <input type="text" id="regUsername" placeholder="Choose username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email</label>
+                        <input type="email" id="regEmail" placeholder="Enter email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <input type="password" id="regPassword" placeholder="Choose password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Create Account</span>
+                        <div class="spinner hidden"></div>
+                    </button>
+                </form>
+
+                <!-- Token Display -->
+                <div id="tokenDisplay" class="token-display hidden">
+                    <h4>🎫 JWT Token (stored)</h4>
+                    <div class="token-value" id="tokenValue"></div>
+                </div>
+            </div>
+
+            <!-- API Tester Card -->
+            <div class="card">
+                <h2><span class="icon">🚀</span> API Request Tester</h2>
+                
+                <form id="apiForm">
+                    <div class="form-group">
+                        <label for="apiUrl">Endpoint URL</label>
+                        <input type="text" id="apiUrl" placeholder="http://localhost:8080/api/..." value="http://localhost:8080/api/test">
+                    </div>
+                    <div class="form-group">
+                        <label for="apiMethod">Method</label>
+                        <select id="apiMethod" class="method-select">
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="apiBody">Request Body (JSON)</label>
+                        <textarea id="apiBody" placeholder='{"key": "value"}'></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="useToken" checked> 
+                            Include JWT Token in Authorization Header
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Send Request</span>
+                        <div class="spinner hidden"></div>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Response Card -->
+            <div class="card full-width">
+                <h2><span class="icon">📬</span> Response</h2>
+                
+                <div class="response-container">
+                    <div class="response-header">
+                        <span id="responseTime">Ready to send request...</span>
+                        <span id="statusBadge" class="status-badge hidden">200 OK</span>
+                    </div>
+                    <div class="response-body">
+                        <pre id="responseOutput">Response will appear here...</pre>
+                    </div>
+                </div>
+
+                <div class="btn-group" style="margin-top: 16px;">
+                    <button class="btn btn-secondary" onclick="copyResponse()">📋 Copy Response</button>
+                    <button class="btn btn-secondary" onclick="clearResponse()">🗑️ Clear</button>
+                    <button class="btn btn-secondary" onclick="clearToken()">🔓 Clear Token</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // Configuration - Update these for your API
+        // ============================================
+        const API_BASE_URL = 'http://localhost:8080';
+        const AUTH_ENDPOINTS = {
+            login: '/api/auth/login',
+            register: '/api/auth/register'
+        };
+
+        // ============================================
+        // State Management
+        // ============================================
+        let jwtToken = localStorage.getItem('jwt_token') || null;
+
+        // Display stored token on load
+        if (jwtToken) {
+            showToken(jwtToken);
+        }
+
+        // ============================================
+        // Tab Switching
+        // ============================================
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Update active tab
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Show corresponding form
+                const tabName = tab.dataset.tab;
+                document.querySelectorAll('.auth-form').forEach(form => form.classList.add('hidden'));
+                document.getElementById(tabName + 'Form').classList.remove('hidden');
+            });
+        });
+
+        // ============================================
+        // Login Handler
+        // ============================================
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            await makeAuthRequest(AUTH_ENDPOINTS.login, {
+                username,
+                password
+            });
+        });
+
+        // ============================================
+        // Register Handler
+        // ============================================
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            await makeAuthRequest(AUTH_ENDPOINTS.register, {
+                username,
+                email,
+                password
+            });
+        });
+
+        // ============================================
+        // API Request Handler
+        // ============================================
+        document.getElementById('apiForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const url = document.getElementById('apiUrl').value;
+            const method = document.getElementById('apiMethod').value;
+            const body = document.getElementById('apiBody').value;
+            const useToken = document.getElementById('useToken').checked;
+
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            if (useToken && jwtToken) {
+                headers['Authorization'] = `Bearer ${jwtToken}`;
+            }
+
+            const options = {
+                method,
+                headers
+            };
+
+            if (method !== 'GET' && body) {
+                try {
+                    options.body = JSON.stringify(JSON.parse(body));
+                } catch {
+                    options.body = body;
+                }
+            }
+
+            await makeRequest(url, options);
+        });
+
+        // ============================================
+        // API Request Functions
+        // ============================================
+        async function makeAuthRequest(endpoint, data) {
+            const btn = document.querySelector('.auth-form:not(.hidden) .btn');
+            toggleLoading(btn, true);
+
+            try {
+                const response = await fetch(API_BASE_URL + endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                displayResponse(response.status, result);
+
+                // If login/register successful and token returned, store it
+                if (response.ok && result.token) {
+                    jwtToken = result.token;
+                    localStorage.setItem('jwt_token', jwtToken);
+                    showToken(jwtToken);
+                }
+            } catch (error) {
+                displayResponse(0, { error: error.message });
+            } finally {
+                toggleLoading(btn, false);
+            }
+        }
+
+        async function makeRequest(url, options) {
+            const btn = document.querySelector('#apiForm .btn');
+            toggleLoading(btn, true);
+            
+            const startTime = performance.now();
+
+            try {
+                const response = await fetch(url, options);
+                const endTime = performance.now();
+                
+                let result;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    result = await response.json();
+                } else {
+                    result = await response.text();
+                }
+
+                displayResponse(response.status, result, endTime - startTime);
+            } catch (error) {
+                displayResponse(0, { error: error.message });
+            } finally {
+                toggleLoading(btn, false);
+            }
+        }
+
+        // ============================================
+        // UI Helper Functions
+        // ============================================
+        function displayResponse(status, data, time = null) {
+            const output = document.getElementById('responseOutput');
+            const badge = document.getElementById('statusBadge');
+            const timeDisplay = document.getElementById('responseTime');
+
+            // Format and display response
+            if (typeof data === 'object') {
+                output.textContent = JSON.stringify(data, null, 2);
+            } else {
+                output.textContent = data;
+            }
+
+            // Update status badge
+            badge.classList.remove('hidden', 'status-success', 'status-error');
+            if (status >= 200 && status < 300) {
+                badge.classList.add('status-success');
+                badge.textContent = `${status} OK`;
+            } else if (status === 0) {
+                badge.classList.add('status-error');
+                badge.textContent = 'Network Error';
+            } else {
+                badge.classList.add('status-error');
+                badge.textContent = `${status} Error`;
+            }
+
+            // Update time
+            if (time) {
+                timeDisplay.textContent = `Response time: ${time.toFixed(0)}ms`;
+            } else {
+                timeDisplay.textContent = 'Request completed';
+            }
+        }
+
+        function showToken(token) {
+            const display = document.getElementById('tokenDisplay');
+            const value = document.getElementById('tokenValue');
+            
+            display.classList.remove('hidden');
+            // Show truncated token
+            value.textContent = token.substring(0, 50) + '...' + token.substring(token.length - 20);
+        }
+
+        function toggleLoading(btn, isLoading) {
+            const text = btn.querySelector('.btn-text');
+            const spinner = btn.querySelector('.spinner');
+            
+            if (isLoading) {
+                text.classList.add('hidden');
+                spinner.classList.remove('hidden');
+                btn.disabled = true;
+            } else {
+                text.classList.remove('hidden');
+                spinner.classList.add('hidden');
+                btn.disabled = false;
+            }
+        }
+
+        function copyResponse() {
+            const output = document.getElementById('responseOutput').textContent;
+            navigator.clipboard.writeText(output);
+            alert('Response copied to clipboard!');
+        }
+
+        function clearResponse() {
+            document.getElementById('responseOutput').textContent = 'Response will appear here...';
+            document.getElementById('statusBadge').classList.add('hidden');
+            document.getElementById('responseTime').textContent = 'Ready to send request...';
+        }
+
+        function clearToken() {
+            jwtToken = null;
+            localStorage.removeItem('jwt_token');
+            document.getElementById('tokenDisplay').classList.add('hidden');
+            alert('Token cleared!');
+        }
+    </script>
+</body>
+</html>
