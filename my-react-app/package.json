@@ -12,10 +12,10 @@
   "dependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.1.5",
+    "react-router-dom": "^6.28.0",
     "react-hook-form": "^7.56.2",
     "zod": "^3.26.0",
-    "react-bootstrap": "^2.13.1",
+    "react-bootstrap": "^2.10.2",
     "bootstrap": "^5.3.3",
     "i18next": "^24.2.2",
     "react-i18next": "^15.4.0"
