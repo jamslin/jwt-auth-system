@@ -6,6 +6,7 @@ import About from './components/About';
 import Contact from './components/Contact';
 import Login from './components/Login';
 import Register from './components/Register';
+import ApiTester from './components/ApiTester';
 import './App.css';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
                 <Nav.Link as={Link} to="/contact">{t('contact')}</Nav.Link>
                 <Nav.Link as={Link} to="/login">{t('login')}</Nav.Link>
                 <Nav.Link as={Link} to="/register">{t('register')}</Nav.Link>
+                <Nav.Link as={Link} to="/api-tester">API Test</Nav.Link>
               </Nav>
               <Nav>
                 <NavDropdown title={i18n.language} id="language-dropdown">
@@ -48,6 +50,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/api-tester" element={<ApiTester />} />
           </Routes>
         </Container>
       </div>
