@@ -8,6 +8,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import ApiTester from './components/ApiTester';
 import './App.css';
+import Tester from './components/Tester';
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -54,6 +55,7 @@ function App() {
           </Routes>
         </Container>
       </div>
+      <Tester />
     </Router>
   );
 }
